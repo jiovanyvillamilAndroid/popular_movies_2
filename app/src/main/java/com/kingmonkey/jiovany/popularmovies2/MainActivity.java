@@ -39,8 +39,8 @@ public class MainActivity extends AppCompatActivity {
 
     private void initPager() {
         SparseArray<Fragment> pages = new SparseArray<>(2);
-        pages.put(0,new BaseItemGridFragment());
-        pages.put(1,new BaseItemGridFragment());
+        pages.put(0,BaseItemGridFragment.newInstance(BaseItemGridFragment.FragmentType.HIGHEST_RATED));
+        pages.put(1,BaseItemGridFragment.newInstance(BaseItemGridFragment.FragmentType.MOST_POPULAR));
         categoriesViewPager.setAdapter(new PageAdapter(getSupportFragmentManager(), pages));
         tabLayout.setTabMode(TabLayout.MODE_FIXED);
         tabLayout.setupWithViewPager(categoriesViewPager);
