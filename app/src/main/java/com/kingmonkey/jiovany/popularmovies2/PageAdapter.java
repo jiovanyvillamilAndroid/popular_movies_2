@@ -10,9 +10,9 @@ import android.util.SparseArray;
  */
 
 public class PageAdapter extends FragmentPagerAdapter {
-    SparseArray<Fragment> pagerFragments;
+    SparseArray<BaseItemGridFragment> pagerFragments;
 
-    public PageAdapter(FragmentManager fm, SparseArray<Fragment> fragments) {
+    public PageAdapter(FragmentManager fm, SparseArray<BaseItemGridFragment> fragments) {
         super(fm);
         pagerFragments = fragments;
     }
@@ -29,6 +29,6 @@ public class PageAdapter extends FragmentPagerAdapter {
 
     @Override
     public CharSequence getPageTitle(int position) {
-        return "Highest Rated";
+        return position == 0 ? "HIGHEST RATED" : "MOST POPULAR";
     }
 }
