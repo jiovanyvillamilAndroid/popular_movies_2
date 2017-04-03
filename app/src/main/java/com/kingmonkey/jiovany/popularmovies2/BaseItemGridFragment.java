@@ -1,8 +1,10 @@
 package com.kingmonkey.jiovany.popularmovies2;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.IntDef;
 import android.support.annotation.Nullable;
+import android.support.v4.app.ActivityOptionsCompat;
 import android.support.v4.app.Fragment;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.GridLayoutManager;
@@ -11,6 +13,7 @@ import android.support.v7.widget.StaggeredGridLayoutManager;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 import android.widget.Toast;
 
 import java.lang.annotation.Retention;
@@ -89,7 +92,7 @@ public class BaseItemGridFragment extends Fragment implements OnItemClick,SwipeR
     }
 
     private void initRecyclerView() {
-        GridLayoutManager gridLayoutManager = new GridLayoutManager(getContext(), 3);
+        GridLayoutManager gridLayoutManager = new GridLayoutManager(getContext(), 2);
         moviesAdapter = new MoviesGridAdapter(this);
         recyclerViewMovies.setAdapter(moviesAdapter);
         recyclerViewMovies.hasFixedSize();
@@ -104,8 +107,12 @@ public class BaseItemGridFragment extends Fragment implements OnItemClick,SwipeR
     }
 
     @Override
-    public void onItemClick(Movie movie) {
-
+    public void onItemClick(Movie movie, View moviePoster) {
+        Intent intent = new Intent(getContext(), MovieDetailActivity.class);
+        intent.putExtra(MovieDetailActivity.EXTRA_MOVIE, movie);
+        ActivityOptionsCompat options = ActivityOptionsCompat.
+                makeSceneTransitionAnimation(getActivity(), moviePoster, "movie_poster");
+        startActivity(intent, options.toBundle());
     }
 
     @Override
