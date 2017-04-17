@@ -4,6 +4,7 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.IntDef;
 import android.support.annotation.Nullable;
+import android.support.annotation.StringDef;
 import android.support.v4.app.ActivityOptionsCompat;
 import android.support.v4.app.Fragment;
 import android.support.v4.widget.SwipeRefreshLayout;
@@ -23,6 +24,7 @@ import java.util.ArrayList;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 
+import static com.kingmonkey.jiovany.popularmovies2.BaseItemGridFragment.FragmentType.FAVORITES;
 import static com.kingmonkey.jiovany.popularmovies2.BaseItemGridFragment.FragmentType.HIGHEST_RATED;
 import static com.kingmonkey.jiovany.popularmovies2.BaseItemGridFragment.FragmentType.MOST_POPULAR;
 
@@ -33,14 +35,15 @@ import static com.kingmonkey.jiovany.popularmovies2.BaseItemGridFragment.Fragmen
 public class BaseItemGridFragment extends Fragment implements OnItemClick,SwipeRefreshLayout.OnRefreshListener,OnRequestFinish<Movie> {
 
     @Retention(RetentionPolicy.SOURCE)
-    @IntDef({HIGHEST_RATED, MOST_POPULAR})
+    @StringDef({HIGHEST_RATED, MOST_POPULAR, FAVORITES})
     public @interface FragmentType {
-        int HIGHEST_RATED = 7777;
-        int MOST_POPULAR = 8888;
+        String HIGHEST_RATED = "HIGHEST RATED";
+        String MOST_POPULAR = "MOST POPULAR";
+        String FAVORITES = "FAVORITES";
     }
 
     public static String FRAGMENT_TYPE_KEY = "fragment_type_key";
-    private int currentFragmentType;
+    private String currentFragmentType;
     private MoviesGridAdapter moviesAdapter;
     private NetworkHelper networkHelper;
 
@@ -50,10 +53,10 @@ public class BaseItemGridFragment extends Fragment implements OnItemClick,SwipeR
     @BindView(R.id.srl_movies)
     SwipeRefreshLayout swipeRefreshLayout;
 
-    public static BaseItemGridFragment newInstance(@FragmentType int fragmentType) {
+    public static BaseItemGridFragment newInstance(@FragmentType String fragmentType) {
         BaseItemGridFragment fragment = new BaseItemGridFragment();
         Bundle bundle = new Bundle(1);
-        bundle.putInt(FRAGMENT_TYPE_KEY, fragmentType);
+        bundle.putString(FRAGMENT_TYPE_KEY, fragmentType);
         fragment.setArguments(bundle);
         return fragment;
     }
@@ -73,7 +76,7 @@ public class BaseItemGridFragment extends Fragment implements OnItemClick,SwipeR
     private void getArgs() {
         Bundle args = getArguments();
         if (args != null) {
-            currentFragmentType = args.getInt(FRAGMENT_TYPE_KEY);
+            currentFragmentType = args.getString(FRAGMENT_TYPE_KEY);
         } else {
             throw new RuntimeException("Please create this fragment using newInstance(@FragmentType int fragmentType) method.");
         }
@@ -101,18 +104,20 @@ public class BaseItemGridFragment extends Fragment implements OnItemClick,SwipeR
 
     @Override
     public void onRefresh() {
-        String typeName = currentFragmentType == HIGHEST_RATED ? Constants.HIGHEST_RATED : Constants.MOST_POPULAR;
-        String urlToGetData = Constants.BASE_URL_MOVIES_DATA.concat(typeName).concat(Constants.API_KEY);
-        networkHelper.getMoviesData(urlToGetData);
+        if(currentFragmentType.equals(FAVORITES)){
+
+        }else{
+            String typeName = currentFragmentType.equals(HIGHEST_RATED) ? Constants.HIGHEST_RATED : Constants.MOST_POPULAR;
+            String urlToGetData = Constants.BASE_URL_MOVIES_DATA.concat(typeName).concat(Constants.API_KEY);
+            networkHelper.getMoviesData(urlToGetData);
+        }
     }
 
     @Override
     public void onItemClick(Movie movie, View moviePoster) {
         Intent intent = new Intent(getContext(), MovieDetailActivity.class);
-        intent.putExtra(MovieDetailActivity.EXTRA_MOVIE, movie);
-        ActivityOptionsCompat options = ActivityOptionsCompat.
-                makeSceneTransitionAnimation(getActivity(), moviePoster, "movie_poster");
-        startActivity(intent, options.toBundle());
+        intent.putExtra(MovieDetailActivity.MOVIE_KEY, movie);
+        startActivity(intent);
     }
 
     @Override

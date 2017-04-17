@@ -2,4 +2,18 @@
     <dimen name="app_bar_height">180dp</dimen>
     <dimen name="fab_margin">16dp</dimen>
     <dimen name="text_margin">16dp</dimen>
+    <dimen name="activity_horizontal_margin">16dp</dimen>
+    <dimen name="activity_vertical_margin">16dp</dimen>
+    <dimen name="common_16dp_dimen">16dp</dimen>
+    <dimen name="home_title_size">24sp</dimen>
+    <dimen name="app_bar_layout_height">256dp</dimen>
+    <dimen name="common_4dp_dimen">4dp</dimen>
+    <dimen name="common_8dp_dimen">8dp</dimen>
+    <dimen name="common_120dp_dimen">120dp</dimen>
+    <dimen name="movie_item_height">200dp</dimen>
+    <dimen name="margin_top_detail_content">75dp</dimen>
+    <dimen name="card_elevation_movie_item">2dp</dimen>
+    <dimen name="common_2dp_dimen">2dp</dimen>
+    <dimen name="poster_detail_width">100dp</dimen>
+    <dimen name="poster_detail_height">150dp</dimen>
 </resources>

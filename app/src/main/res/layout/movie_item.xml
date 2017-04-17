@@ -5,7 +5,7 @@
     android:orientation="vertical"
     android:gravity="center"
     android:padding="8dp"
-    android:layout_marginLeft="50dp"
+    android:layout_marginStart="50dp"
     android:layout_gravity="center"
     android:layout_width="128dp"
     android:layout_height="wrap_content">
@@ -24,7 +24,6 @@
             app:cardElevation="8dp">
 
             <ImageView
-                android:transitionName="movie_poster"
                 android:id="@+id/movie_poster_iv"
                 android:layout_width="100dp"
                 android:layout_height="150dp" />
@@ -32,8 +31,8 @@
 
         <android.support.v7.widget.CardView
             app:cardBackgroundColor="@color/orangeColor"
-            android:layout_toRightOf="@+id/movie_poster_container"
-            android:layout_marginLeft="-11dp"
+            android:layout_toEndOf="@+id/movie_poster_container"
+            android:layout_marginStart="-11dp"
             android:layout_marginBottom="16dp"
             android:layout_centerVertical="true"
             android:layout_alignBottom="@+id/movie_poster_container"
@@ -47,7 +46,7 @@
 
 
             <TextView
-                android:textSize="10sp"
+                android:textSize="12sp"
                 android:layout_gravity="center"
                 android:id="@+id/vote_average_tv"
                 android:layout_width="wrap_content"
@@ -61,8 +60,11 @@
     </RelativeLayout>
 
     <TextView
+        android:gravity="center"
+        android:textStyle="bold"
         android:id="@+id/movie_title_tv"
         android:layout_marginTop="8dp"
+        android:textAllCaps="true"
         tools:text="Jurassic World"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content" />

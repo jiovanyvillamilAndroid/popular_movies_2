@@ -15,4 +15,5 @@ public class Constants {
     public static String BASE_URL_MOVIES_DATA = "http://api.themoviedb.org/3/movie/";
     public static String RESULTS_JSON_PARAMETER = "results";
     public static String BLACK_STAR_UNICODE = "\u2605";
+    public static int COLLAPSED_TOOLBAR_SIZE = 528;
 }
