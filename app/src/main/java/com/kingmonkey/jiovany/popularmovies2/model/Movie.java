@@ -1,6 +1,7 @@
-package com.kingmonkey.jiovany.popularmovies2;
+package com.kingmonkey.jiovany.popularmovies2.model;
 
 import com.google.gson.annotations.SerializedName;
+import com.kingmonkey.jiovany.popularmovies2.Constants;
 
 import java.io.Serializable;
 

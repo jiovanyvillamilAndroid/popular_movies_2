@@ -10,6 +10,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.bumptech.glide.Glide;
+import com.kingmonkey.jiovany.popularmovies2.model.Movie;
 
 import java.util.ArrayList;
 import java.util.List;

@@ -1,6 +1,9 @@
 package com.kingmonkey.jiovany.popularmovies2;
 
+import android.util.Log;
+
 import com.google.gson.Gson;
+import com.kingmonkey.jiovany.popularmovies2.model.Movie;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -16,17 +19,15 @@ import okhttp3.Request;
 import okhttp3.Response;
 
 public class NetworkHelper {
-    private OnRequestFinish networkListener;
     private OkHttpClient okHttpClient;
     private Gson gson;
 
-    public NetworkHelper(OnRequestFinish networkListener) {
-        this.networkListener = networkListener;
+    public NetworkHelper() {
         okHttpClient = new OkHttpClient();
         gson = new Gson();
     }
 
-    public void getMoviesData(String url) {
+    public void getMoviesData(String url, final OnRequestFinish networkListener) {
         Request request = new Request.Builder()
                 .url(url)
                 .build();
@@ -52,6 +53,13 @@ public class NetworkHelper {
                 }
             }
         });
+    }
+
+    public void getVideo(String movieId, Callback callback){
+        Request request = new Request.Builder()
+                .url(Constants.BASE_URL_MOVIES_DATA.concat(movieId).concat(Constants.MOVIE_VIDEO).concat(Constants.API_KEY))
+                .build();
+        okHttpClient.newCall(request).enqueue(callback);
     }
 
     private ArrayList<Movie> parseMoviesFromJSON(String jsonString) throws JSONException {

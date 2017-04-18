@@ -1,18 +1,18 @@
 package com.kingmonkey.jiovany.popularmovies2;
 
+import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
+import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.design.widget.AppBarLayout;
 import android.support.design.widget.CollapsingToolbarLayout;
-import android.support.design.widget.FloatingActionButton;
-import android.support.design.widget.Snackbar;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.graphics.Palette;
 import android.support.v7.widget.CardView;
 import android.support.v7.widget.Toolbar;
-import android.view.MenuItem;
 import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
@@ -26,13 +26,28 @@ import android.widget.Toast;
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.request.RequestListener;
 import com.bumptech.glide.request.target.Target;
+import com.google.gson.Gson;
+import com.google.gson.reflect.TypeToken;
+import com.kingmonkey.jiovany.popularmovies2.model.Movie;
+import com.kingmonkey.jiovany.popularmovies2.model.Video;
+
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import java.io.IOException;
+import java.lang.reflect.Type;
+import java.util.ArrayList;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
+import okhttp3.Call;
+import okhttp3.Callback;
+import okhttp3.Response;
 
-public class MovieDetailActivity extends AppCompatActivity {
+public class MovieDetailActivity extends AppCompatActivity implements OnRequestFinish {
     public static String MOVIE_KEY = "movie_to_show_detail";
-    Movie currentMovie;
+    private Movie currentMovie;
+    private Gson gson;
     @BindView(R.id.cv_movie_poster)
     CardView cardViewPoster;
     @BindView(R.id.appbar)
@@ -66,11 +81,77 @@ public class MovieDetailActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_movie_detail);
+        gson = new Gson();
         ButterKnife.bind(this);
         getMovieFromIntent();
         initToolbar();
         bindData();
         scalePosterOnCollapse();
+        getMovieTrailer();
+    }
+
+    private void getMovieTrailer() {
+        NetworkHelper networkHelper = new NetworkHelper();
+        networkHelper.getVideo(String.valueOf(currentMovie.getId()), new Callback() {
+            @Override
+            public void onFailure(Call call, IOException e) {
+                backDrop.setClickable(false);
+                playIcon.setVisibility(View.GONE);
+            }
+
+            @Override
+            public void onResponse(Call call, Response response) throws IOException {
+                if (response.isSuccessful()) {
+                    String responseString = response.body().string();
+                    try {
+                        JSONObject responseJSON = new JSONObject(responseString);
+                        Type listType = new TypeToken<ArrayList<Video>>() {}.getType();
+                        ArrayList<Video> videos = gson.fromJson(responseJSON.getString("results"), listType);
+                        enablePlayTrailerEvents(videos);
+                    } catch (JSONException e) {
+                        backDrop.setClickable(false);
+                        playIcon.setVisibility(View.GONE);
+                        e.printStackTrace();
+                    }
+                }
+
+            }
+        });
+    }
+
+    private void enablePlayTrailerEvents(ArrayList<Video> videos) {
+        backDrop.setClickable(true);
+        playIcon.setVisibility(View.VISIBLE);
+        Video mainVideo = null;
+        for (Video video : videos) {
+            if (video.getType().equalsIgnoreCase("Trailer") && video.getSite().equalsIgnoreCase("YouTube")) {
+                mainVideo = video;
+                break;
+            }
+        }
+        final Video finalMainVideo = mainVideo;
+        backDrop.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                playVideo(finalMainVideo);
+            }
+        });
+        playIcon.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                playVideo(finalMainVideo);
+            }
+        });
+
+    }
+
+    private void playVideo(Video trailer){
+        Intent openYouTube = new Intent(Intent.ACTION_VIEW, Uri.parse("http://www.youtube.com/watch?v="+trailer.getKey()));
+        openYouTube.putExtra("force_fullscreen",true);
+        PackageManager packageManager = getPackageManager();
+        if(openYouTube.resolveActivity(packageManager) != null){
+            startActivity(openYouTube);
+        }
     }
 
     private void initToolbar() {
@@ -130,8 +211,6 @@ public class MovieDetailActivity extends AppCompatActivity {
         voteAverage.setText(String.valueOf(currentMovie.getVoteAverage()).concat(Constants.BLACK_STAR_UNICODE));
         voteCount.setText(String.valueOf(currentMovie.getVoteCount()));
         popularity.setText(String.valueOf(currentMovie.getPopularity()));
-        backDrop.setClickable(currentMovie.isVideo());
-        playIcon.setVisibility(currentMovie.isVideo() ? View.VISIBLE : View.GONE);
     }
 
     private void loadBackDrop() {
@@ -169,5 +248,15 @@ public class MovieDetailActivity extends AppCompatActivity {
         } else {
             Toast.makeText(this, getString(R.string.response_empty_message), Toast.LENGTH_LONG).show();
         }
+    }
+
+    @Override
+    public void onSuccess(ArrayList response) {
+
+    }
+
+    @Override
+    public void onFailure(int errorMessageResId) {
+
     }
 }

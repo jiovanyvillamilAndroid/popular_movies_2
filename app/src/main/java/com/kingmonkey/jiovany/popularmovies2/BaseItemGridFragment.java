@@ -2,20 +2,18 @@ package com.kingmonkey.jiovany.popularmovies2;
 
 import android.content.Intent;
 import android.os.Bundle;
-import android.support.annotation.IntDef;
 import android.support.annotation.Nullable;
 import android.support.annotation.StringDef;
-import android.support.v4.app.ActivityOptionsCompat;
 import android.support.v4.app.Fragment;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.support.v7.widget.StaggeredGridLayoutManager;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ImageView;
 import android.widget.Toast;
+
+import com.kingmonkey.jiovany.popularmovies2.model.Movie;
 
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
@@ -32,7 +30,7 @@ import static com.kingmonkey.jiovany.popularmovies2.BaseItemGridFragment.Fragmen
  * Created by jiovany on 3/27/17.
  */
 
-public class BaseItemGridFragment extends Fragment implements OnItemClick,SwipeRefreshLayout.OnRefreshListener,OnRequestFinish<Movie> {
+public class BaseItemGridFragment extends Fragment implements OnItemClick, SwipeRefreshLayout.OnRefreshListener {
 
     @Retention(RetentionPolicy.SOURCE)
     @StringDef({HIGHEST_RATED, MOST_POPULAR, FAVORITES})
@@ -90,7 +88,7 @@ public class BaseItemGridFragment extends Fragment implements OnItemClick,SwipeR
 
     private void initFragment() {
         swipeRefreshLayout.setRefreshing(true);
-        networkHelper = new NetworkHelper(this);
+        networkHelper = new NetworkHelper();
         onRefresh();
     }
 
@@ -104,12 +102,39 @@ public class BaseItemGridFragment extends Fragment implements OnItemClick,SwipeR
 
     @Override
     public void onRefresh() {
-        if(currentFragmentType.equals(FAVORITES)){
-
-        }else{
+        if (currentFragmentType.equals(FAVORITES)) {
+            //TODO: retrieve data from Content Provider
+        } else {
             String typeName = currentFragmentType.equals(HIGHEST_RATED) ? Constants.HIGHEST_RATED : Constants.MOST_POPULAR;
             String urlToGetData = Constants.BASE_URL_MOVIES_DATA.concat(typeName).concat(Constants.API_KEY);
-            networkHelper.getMoviesData(urlToGetData);
+            networkHelper.getMoviesData(urlToGetData, new OnRequestFinish() {
+                @Override
+                public void onSuccess(final ArrayList response) {
+                    getActivity().runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            swipeRefreshLayout.setRefreshing(false);
+                            if (response != null) {
+                                moviesAdapter.setMoviesData(response);
+                                recyclerViewMovies.smoothScrollToPosition(0);
+                            } else {
+                                onFailure(R.string.response_empty_message);
+                            }
+                        }
+                    });
+                }
+
+                @Override
+                public void onFailure(final int errorMessageResId) {
+                    getActivity().runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            swipeRefreshLayout.setRefreshing(false);
+                            Toast.makeText(getContext(), getString(errorMessageResId), Toast.LENGTH_LONG).show();
+                        }
+                    });
+                }
+            });
         }
     }
 
@@ -120,30 +145,4 @@ public class BaseItemGridFragment extends Fragment implements OnItemClick,SwipeR
         startActivity(intent);
     }
 
-    @Override
-    public void onSuccess(final ArrayList<Movie> response) {
-        getActivity().runOnUiThread(new Runnable() {
-            @Override
-            public void run() {
-                swipeRefreshLayout.setRefreshing(false);
-                if (response != null) {
-                    moviesAdapter.setMoviesData(response);
-                    recyclerViewMovies.smoothScrollToPosition(0);
-                } else {
-                    onFailure(R.string.response_empty_message);
-                }
-            }
-        });
-    }
-
-    @Override
-    public void onFailure(final int errorMessageResId) {
-        getActivity().runOnUiThread(new Runnable() {
-            @Override
-            public void run() {
-                swipeRefreshLayout.setRefreshing(false);
-                Toast.makeText(getContext(), getString(errorMessageResId), Toast.LENGTH_LONG).show();
-            }
-        });
-    }
 }

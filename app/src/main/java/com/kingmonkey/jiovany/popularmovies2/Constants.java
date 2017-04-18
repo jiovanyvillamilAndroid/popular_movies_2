@@ -16,4 +16,5 @@ public class Constants {
     public static String RESULTS_JSON_PARAMETER = "results";
     public static String BLACK_STAR_UNICODE = "\u2605";
     public static int COLLAPSED_TOOLBAR_SIZE = 528;
+    public static String MOVIE_VIDEO = "/videos";
 }
